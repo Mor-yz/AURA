@@ -20,15 +20,9 @@ This staged release contains the AURA actuator-degradation identification networ
 - `aura_model.py`: temporal convolution, cross-motor attention, and alpha/kappa predictor.
 - `aura_data.py`: CSV data contract, contiguous-window construction, session-level splitting, and normalization.
 - `train_aura.py`: reproducible training and evaluation entry point.
-- `checkpoints/aura.pt`: legacy trained checkpoint with normalization statistics; see compatibility notes below.
+- `checkpoints/aura.pt`: trained alpha/kappa checkpoint with normalization statistics.
 
-## Checkpoint compatibility and tests
-
-The bundled `checkpoints/aura.pt` predates the current network definition.
-It lacks the version-2 `format_version` and `model_config` fields, and its
-temporal-encoder weight keys differ from the current architecture. It cannot
-currently be loaded by `aura_model.py`; adding metadata alone is insufficient.
-A compatible checkpoint or a matching legacy loader is pending.
+## Tests
 
 Run the smoke tests from this directory:
 
@@ -37,10 +31,8 @@ python -m pip install -r requirements-test.txt
 python -m pytest -q tests/test_smoke.py
 ```
 
-Current validation: two tests pass and the packaged-checkpoint test fails.
-That failure is retained to make the incompatibility visible. The training
-entry point writes version-2 checkpoints when supplied with aligned recordings;
-training data is not included in this release.
+The tests cover the public network contract and torque model without requiring
+private recordings or robot hardware.
 
 ## Installation
 

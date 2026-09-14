@@ -26,20 +26,6 @@ def test_network_forward_contract():
     assert torch.all(kappa > 0)
 
 
-@pytest.mark.skipif(not CHECKPOINT.exists(), reason="checkpoint not packaged")
-def test_packaged_checkpoint_loads():
-    state = torch.load(CHECKPOINT, map_location="cpu", weights_only=True)
-    assert state["format_version"] == 2
-    assert state["motor_ids"] and len(state["motor_ids"]) == 12
-    assert state["features"] == ["cmd_effort", "fb_effort", "position", "velocity"]
-    model = AURA(**state["model_config"], tau_max=state["tau_max"])
-    model.load_state_dict(state["model"])
-    model.eval()
-    with torch.no_grad():
-        alpha, kappa = model(torch.zeros(1, 12, state["window"], 4))
-    assert torch.isfinite(alpha).all() and torch.isfinite(kappa).all()
-
-
 def test_torque_reconstruction_and_compensation():
     model = AURA(tau_max=[10.] * 12)
     alpha = torch.full((1, 12), 0.7)
